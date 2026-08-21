@@ -76,7 +76,7 @@ func draw(into context: CGContext, side: CGFloat) {
     ))
     context.clip()
     context.setFillColor(CGColor(red: 0.24, green: 0.82, blue: 0.48, alpha: 1))
-    context.fill(CGRect(x: body.minX, y: body.minY, width: body.width, height: body.height * 0.62))
+    context.fill(CGRect(x: body.minX, y: body.minY, width: body.width, height: body.height * 0.55))
     context.restoreGState()
 
     // Eyes.
@@ -96,15 +96,18 @@ func draw(into context: CGContext, side: CGFloat) {
     // Lightning bolt badge.
     context.setFillColor(CGColor(red: 1.0, green: 0.84, blue: 0.25, alpha: 1))
     let bolt = CGMutablePath()
-    bolt.move(to: CGPoint(x: s(700), y: s(700)))
-    bolt.addLine(to: CGPoint(x: s(560), y: s(480)))
-    bolt.addLine(to: CGPoint(x: s(660), y: s(480)))
-    bolt.addLine(to: CGPoint(x: s(620), y: s(280)))
-    bolt.addLine(to: CGPoint(x: s(770), y: s(520)))
-    bolt.addLine(to: CGPoint(x: s(670), y: s(520)))
+    bolt.move(to: CGPoint(x: s(707), y: s(470)))
+    bolt.addLine(to: CGPoint(x: s(620), y: s(334)))
+    bolt.addLine(to: CGPoint(x: s(682), y: s(334)))
+    bolt.addLine(to: CGPoint(x: s(657), y: s(210)))
+    bolt.addLine(to: CGPoint(x: s(750), y: s(359)))
+    bolt.addLine(to: CGPoint(x: s(688), y: s(359)))
     bolt.closeSubpath()
     context.addPath(bolt)
-    context.fillPath()
+    context.setStrokeColor(CGColor(red: 1, green: 1, blue: 1, alpha: 0.95))
+    context.setLineWidth(s(14))
+    context.setLineJoin(.round)
+    context.drawPath(using: .fillStroke)
 }
 
 for (points, scale) in sizes {
