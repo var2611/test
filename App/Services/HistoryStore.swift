@@ -28,7 +28,9 @@ final class HistoryStore: ObservableObject {
         self.history = HistoryStore.load(from: fileURL)
     }
 
-    static func defaultFileURL() -> URL? {
+    /// `nonisolated` because it is used as a default argument, which is evaluated
+    /// outside the actor. It touches no isolated state.
+    nonisolated static func defaultFileURL() -> URL? {
         do {
             let directory = try FileManager.default.url(
                 for: .applicationSupportDirectory,
