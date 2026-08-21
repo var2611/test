@@ -68,7 +68,7 @@ Also verified:
 
 - [ ] Detach `Wattson.storekit` from the scheme (a StoreKit configuration file left
       attached makes purchases fake, and the reviewer will see no products).
-- [ ] `make icon` has been run and the ten PNGs exist in the asset catalog.
+- [x] The ten icon PNGs exist in the asset catalog (`make icon` regenerates them).
 - [ ] `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` bumped in `project.yml`.
 - [ ] `swift test` passes.
 - [ ] Ran on a real machine on battery, on the adapter, at 100%, and with

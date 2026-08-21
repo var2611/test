@@ -1,5 +1,7 @@
 # Wattson ⚡️
 
+[![CI](https://github.com/var2611/test/actions/workflows/ci.yml/badge.svg?branch=claude/macbook-battery-status-app-gqicmk)](https://github.com/var2611/test/actions/workflows/ci.yml)
+
 **A menu bar power companion for Apple silicon MacBooks.**
 Wattson tells you whether your Mac is running on the battery or the adapter, how many
 watts it is actually burning, and how healthy the cell is — and does it with a
@@ -42,7 +44,21 @@ To develop the UI without draining a real battery, run the app with `--simulate`
 (or `WATTSON_SIMULATE=1`), which drives every view from a scripted power source that
 cycles through discharging, charging and fully-charged.
 
-Regenerate the app icon at any time with `make icon`.
+The app icon is generated, not drawn: `make icon` runs
+`Scripts/GenerateAppIcon.swift`, which renders all ten sizes with Core Graphics
+straight into the asset catalog. The PNGs are committed, so a fresh clone builds
+with a real icon.
+
+### What CI checks
+
+Every push is verified on real macOS runners, because neither target can be
+compiled anywhere else:
+
+| Job | Runner | What it proves |
+| --- | --- | --- |
+| `WattsonCore tests` | macOS 14 / Xcode 15.4 | The core builds with Swift 5.9 and all 83 tests pass |
+| `Build Wattson.app` | macOS 15 / Xcode 16 | XcodeGen generates, the app compiles and links, the icon generator runs |
+| Smoke test | macOS 15 | The built app launches on a machine **with no battery at all**, reads an empty `AppleSmartBattery` node and keeps running — the degradation path, exercised for real |
 
 ### Before submitting to the App Store
 
