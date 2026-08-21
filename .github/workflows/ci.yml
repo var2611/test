@@ -1,0 +1,48 @@
+name: CI
+
+# The core library and the app are built on a real macOS runner, which is the only
+# place either of them can be compiled.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core-tests:
+    name: WattsonCore tests
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          swift --version
+          xcodebuild -version
+
+      - name: swift test
+        run: swift test --enable-code-coverage
+
+  app-build:
+    name: Build Wattson.app
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate the Xcode project
+        run: xcodegen generate
+
+      - name: Build (Debug, unsigned)
+        run: |
+          xcodebuild \
+            -project Wattson.xcodeproj \
+            -scheme Wattson \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
