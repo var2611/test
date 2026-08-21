@@ -236,7 +236,9 @@ final class StoreManager: ObservableObject, EntitlementProviding {
         updatesTask = Task { [weak self] in
             for await update in Transaction.updates {
                 guard let self else { return }
-                if let transaction = await self.verified(update) {
+                // This task inherits the main actor from the enclosing type, so the
+                // verification hop is not an await.
+                if let transaction = self.verified(update) {
                     await transaction.finish()
                 }
                 await self.refreshEntitlements()

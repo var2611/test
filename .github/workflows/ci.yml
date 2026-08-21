@@ -40,6 +40,9 @@ jobs:
       - name: Generate the Xcode project
         run: xcodegen generate
 
+      - name: Generate the app icon
+        run: swift Scripts/GenerateAppIcon.swift
+
       - name: Build (Debug, unsigned)
         run: |
           xcodebuild \
@@ -51,3 +54,33 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             build
+
+      # A runner has no battery, which is exactly the degradation path worth
+      # proving: the app must come up, read an empty AppleSmartBattery node and
+      # keep running rather than crash or exit.
+      - name: Smoke test — launch and stay up
+        run: |
+          set -o pipefail
+          PRODUCTS_DIR="$(xcodebuild -project Wattson.xcodeproj -scheme Wattson \
+            -configuration Debug -showBuildSettings 2>/dev/null \
+            | awk -F' = ' '/ BUILT_PRODUCTS_DIR/ {print $2; exit}')"
+          APP="$PRODUCTS_DIR/Wattson.app"
+          echo "Launching $APP"
+          "$APP/Contents/MacOS/Wattson" &
+          PID=$!
+          sleep 15
+          if ! kill -0 "$PID" 2>/dev/null; then
+            echo "::error::Wattson exited within 15 seconds of launch"
+            ls -1 ~/Library/Logs/DiagnosticReports 2>/dev/null || true
+            cat ~/Library/Logs/DiagnosticReports/Wattson* 2>/dev/null || true
+            exit 1
+          fi
+          echo "Still running after 15s."
+          kill "$PID"
+
+      - name: Upload the generated app icon
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-icon
+          path: App/Resources/Assets.xcassets/AppIcon.appiconset/*.png
+          if-no-files-found: error
