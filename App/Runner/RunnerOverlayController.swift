@@ -59,8 +59,13 @@ final class RunnerOverlayController: ObservableObject {
 
         reposition()
         panel.orderFrontRegardless()
-        isVisible = true
-        monitor.beginBoost()
+        // The refresh boost is a balanced pair, so it is only taken on the
+        // hidden → visible transition: clicking the mascot twice must not leave
+        // the monitor permanently boosted.
+        if !isVisible {
+            isVisible = true
+            monitor.beginBoost()
+        }
         scheduleAutoHide(after: seconds)
         Log.overlay.info("Runner shown")
     }

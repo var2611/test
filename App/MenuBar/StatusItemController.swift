@@ -133,6 +133,9 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     private func showPopover() {
         guard let button = statusItem.button else { return }
+        // Balanced with `endBoost` in `popoverDidClose`, so re-showing an
+        // already-open popover must not take a second boost.
+        guard popover?.isShown != true else { return }
 
         let popover = self.popover ?? makePopover()
         self.popover = popover
