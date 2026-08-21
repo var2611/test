@@ -25,6 +25,8 @@ jobs:
 
   app-build:
     name: Build Wattson.app
+    permissions:
+      contents: write
     # Xcode 16: current XcodeGen writes the Xcode 16 project format, which
     # Xcode 15 refuses to open.
     runs-on: macos-15
@@ -84,3 +86,21 @@ jobs:
           name: app-icon
           path: App/Resources/Assets.xcassets/AppIcon.appiconset/*.png
           if-no-files-found: error
+
+      # The icon is generated from Scripts/GenerateAppIcon.swift rather than
+      # hand-drawn, but the PNGs still have to exist in the asset catalog for the
+      # app to have an icon. This commits them the first time they are produced
+      # and is a no-op on every run after that.
+      - name: Commit the icon if it changed
+        if: github.event_name == 'push'
+        run: |
+          ICONS=App/Resources/Assets.xcassets/AppIcon.appiconset
+          if [ -z "$(git status --porcelain "$ICONS")" ]; then
+            echo "Icon already committed and unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$ICONS"/*.png
+          git commit -m "Add the generated app icon PNGs [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
