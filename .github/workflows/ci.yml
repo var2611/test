@@ -25,9 +25,14 @@ jobs:
 
   app-build:
     name: Build Wattson.app
-    runs-on: macos-14
+    # Xcode 16: current XcodeGen writes the Xcode 16 project format, which
+    # Xcode 15 refuses to open.
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: xcodebuild -version
 
       - name: Install XcodeGen
         run: brew install xcodegen

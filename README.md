@@ -119,5 +119,9 @@ Apple Account and Family Sharing. Nothing about the machine ever leaves it — s
 
 ## Requirements
 
-macOS 13 or later. Apple silicon is the target; Intel MacBooks work, with the
-silicon-specific copy hidden. Built with Swift 5.9 / Xcode 15.
+macOS 13 or later at runtime. Apple silicon is the target; Intel MacBooks work,
+with the silicon-specific copy hidden.
+
+To build it you need **Xcode 16 or later** — current XcodeGen writes the Xcode 16
+project format. The core library itself is Swift 5.9 and builds with older
+toolchains (`swift test` is run on Xcode 15 in CI to keep it that way).
